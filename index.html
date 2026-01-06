@@ -6,39 +6,113 @@
     <title>GitFast - One Click HTML Deployment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        // Apply theme as early as possible to prevent flash
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .dark body {
             background-color: #0f172a;
             color: #f8fafc;
         }
 
+        body:not(.dark) {
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+
         .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
             backdrop-filter: blur(12px);
+            transition: background 0.3s ease, border 0.3s ease;
+        }
+
+        .dark .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .gradient-text {
-            background: linear-gradient(90deg, #38bdf8, #818cf8);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        body:not(.dark) .glass-panel {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
         }
 
         .code-input {
+            font-family: 'Fira Code', monospace;
+            resize: vertical;
+            min-height: 120px;
+            max-height: 350px;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .dark .code-input {
             background: #020617;
             border: 1px solid #334155;
             color: #94a3b8;
-            font-family: 'Fira Code', monospace;
-            resize: none;
         }
 
-        .code-input:focus {
-            outline: none;
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+        body:not(.dark) .code-input {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #334155;
+        }
+
+        /* iOS Style Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .slider {
+            background-color: #38bdf8;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
         }
 
         .progress-bar-fill {
@@ -49,10 +123,10 @@
         ::-webkit-scrollbar {
             width: 8px;
         }
-        ::-webkit-scrollbar-track {
+        .dark ::-webkit-scrollbar-track {
             background: #0f172a;
         }
-        ::-webkit-scrollbar-thumb {
+        .dark ::-webkit-scrollbar-thumb {
             background: #334155;
             border-radius: 4px;
         }
@@ -61,81 +135,94 @@
 <body class="min-h-screen flex flex-col">
 
     <!-- Navigation -->
-    <nav class="border-b border-slate-800 p-4">
+    <nav class="border-b dark:border-slate-800 border-slate-200 p-4">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
             <div class="flex items-center space-x-2">
-                <div class="bg-sky-500 p-2 rounded-lg">
+                <div class="bg-sky-500 p-2 rounded-lg shadow-lg shadow-sky-500/20">
                     <i class="fas fa-bolt text-white"></i>
                 </div>
                 <span class="text-xl font-bold tracking-tight">GitFast</span>
             </div>
-            <div id="authStatus" class="text-xs font-medium px-3 py-1 rounded-full bg-slate-800 text-slate-400">
-                Token: Not Configured
+            
+            <div class="flex items-center space-x-6">
+                <!-- iOS Style Toggle -->
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-sun text-slate-400 text-xs"></i>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
+                        <span class="slider"></span>
+                    </label>
+                    <i class="fas fa-moon text-slate-400 text-xs"></i>
+                </div>
+                <div id="authStatus" class="hidden md:block text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-slate-800 text-slate-400">
+                    TOKEN: NOT SET
+                </div>
             </div>
         </div>
     </nav>
 
     <!-- Main Content -->
-    <main class="flex-grow max-w-6xl w-full mx-auto p-6 flex flex-col space-y-6">
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col space-y-4">
         
-        <header class="text-center py-6">
-            <h1 class="text-4xl md:text-5xl font-extrabold mb-3">Publish <span class="gradient-text">GitFast</span></h1>
-            <p class="text-slate-400 max-w-2xl mx-auto text-sm">Deploy any HTML code to a live GitHub URL instantly.</p>
+        <header class="text-center py-4">
+            <p class="text-slate-500 dark:text-slate-400 text-base md:text-lg font-medium">Deploy any HTML code to a live GitHub URL instantly.</p>
         </header>
 
         <!-- Project Info Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="glass-panel p-4 rounded-xl">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Project Name (Repository)</label>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">Project Name</label>
                 <div class="relative">
-                    <i class="fas fa-folder absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                    <input type="text" id="repoName" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg py-2 pl-10 pr-4 text-white focus:outline-none focus:border-sky-500" placeholder="e.g. my-awesome-landing-page">
+                    <i class="fas fa-folder absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" id="repoName" class="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg py-2 pl-10 pr-4 dark:text-white text-slate-900 focus:outline-none focus:border-sky-500 transition-colors" placeholder="e.g. portfolio-site">
                 </div>
             </div>
             <div class="glass-panel p-4 rounded-xl">
-                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">GitHub Personal Access Token</label>
+                <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2">GitHub Personal Access Token</label>
                 <div class="flex gap-2">
                     <div class="relative flex-grow">
-                        <i class="fas fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-500"></i>
-                        <input type="password" id="ghToken" oninput="autoSaveToken(this.value)" class="w-full bg-slate-900/50 border border-slate-700 rounded-lg py-2 pl-10 pr-4 text-white focus:outline-none focus:border-sky-500" placeholder="ghp_xxxxxxxxxxxx">
+                        <i class="fas fa-key absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                        <input type="password" id="ghToken" oninput="autoSaveToken(this.value)" class="w-full bg-white dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-lg py-2 pl-10 pr-4 dark:text-white text-slate-900 focus:outline-none focus:border-sky-500 transition-colors" placeholder="ghp_xxxxxxxxxxxx">
                     </div>
-                    <button id="deleteTokenBtn" onclick="deleteToken()" class="bg-red-900/30 hover:bg-red-800/50 text-red-400 px-4 rounded-lg text-sm font-medium hidden transition-colors">Delete</button>
+                    <button id="deleteTokenBtn" onclick="deleteToken()" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 px-4 rounded-lg text-sm font-medium hidden transition-colors">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
                 </div>
             </div>
         </div>
 
         <!-- Editor Section -->
-        <div class="glass-panel rounded-2xl overflow-hidden flex flex-col flex-grow shadow-2xl min-h-[300px]">
-            <div class="bg-slate-800/50 p-3 flex justify-between items-center border-b border-slate-700">
-                <div class="flex space-x-2">
-                    <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+        <div class="glass-panel rounded-2xl overflow-hidden flex flex-col shadow-sm">
+            <div class="bg-slate-50 dark:bg-slate-800/50 p-2 flex justify-between items-center border-b border-slate-200 dark:border-slate-700">
+                <div class="flex space-x-2 ml-2">
+                    <div class="w-2.5 h-2.5 rounded-full bg-red-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-yellow-400"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-green-400"></div>
                 </div>
                 <div class="text-[10px] text-slate-500 font-mono uppercase tracking-widest">Source HTML</div>
-                <button onclick="document.getElementById('htmlCode').value = ''" class="text-xs text-slate-500 hover:text-white transition">Clear</button>
+                <button onclick="document.getElementById('htmlCode').value = ''" class="text-xs text-slate-400 hover:text-sky-500 transition pr-2 font-medium">Clear</button>
             </div>
-            <textarea id="htmlCode" class="code-input w-full flex-grow p-4 text-sm leading-relaxed" placeholder="Paste your HTML code here..."></textarea>
+            <textarea id="htmlCode" class="code-input w-full p-4 text-sm leading-relaxed outline-none" placeholder="Paste your HTML code here..."></textarea>
         </div>
 
         <!-- Progress Bar (Hidden by default) -->
-        <div id="progressContainer" class="hidden space-y-2">
-            <div class="flex justify-between text-xs font-medium text-slate-400">
-                <span id="progressLabel">Initializing deployment...</span>
+        <div id="progressContainer" class="hidden space-y-2 px-1">
+            <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                <span id="progressLabel">Initializing...</span>
                 <span id="timeLeft">Est. 5s</span>
             </div>
-            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
-                <div id="progressBar" class="progress-bar-fill bg-sky-500 h-full w-0"></div>
+            <div class="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                <div id="progressBar" class="progress-bar-fill bg-sky-500 h-full w-0 shadow-[0_0_8px_rgba(56,189,248,0.5)]"></div>
             </div>
         </div>
 
         <!-- Action Bar -->
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4 py-2">
-            <div id="statusMessage" class="text-slate-500 text-sm">
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 py-2 pb-10">
+            <div id="statusMessage" class="text-slate-400 text-xs font-medium">
                 Ready to deploy your next masterpiece.
             </div>
-            <button id="deployBtn" onclick="handleDeploy()" class="w-full md:w-auto bg-sky-500 hover:bg-sky-400 text-white font-bold py-3 px-10 rounded-xl transition-all shadow-lg shadow-sky-500/20 flex items-center justify-center">
-                <i class="fas fa-rocket mr-2"></i>
+            <button id="deployBtn" onclick="handleDeploy()" class="w-full md:w-auto bg-sky-500 hover:bg-sky-400 text-white font-bold py-3.5 px-14 rounded-2xl transition-all shadow-xl shadow-sky-500/25 flex items-center justify-center group">
+                <i class="fas fa-rocket mr-2 group-hover:-translate-y-1 transition-transform"></i>
                 Publish Site
             </button>
         </div>
@@ -143,35 +230,35 @@
     </main>
 
     <!-- Post-Deployment Waiting Overlay -->
-    <div id="waitOverlay" class="fixed inset-0 bg-slate-950/95 z-50 hidden flex flex-center items-center justify-center p-6 text-center">
+    <div id="waitOverlay" class="fixed inset-0 bg-slate-950/98 z-50 hidden flex flex-center items-center justify-center p-6 text-center backdrop-blur-sm">
         <div class="max-w-md w-full">
             <div id="waitingState">
                 <div class="relative w-32 h-32 mx-auto mb-8">
                     <svg class="w-full h-full transform -rotate-90">
-                        <circle cx="64" cy="64" r="60" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-800"></circle>
-                        <circle id="timerCircle" cx="64" cy="64" r="60" stroke="currentColor" stroke-width="8" fill="transparent" stroke-dasharray="377" stroke-dashoffset="0" class="text-sky-500 transition-all duration-1000 linear"></circle>
+                        <circle cx="64" cy="64" r="60" stroke="currentColor" stroke-width="6" fill="transparent" class="text-slate-900"></circle>
+                        <circle id="timerCircle" cx="64" cy="64" r="60" stroke="currentColor" stroke-width="6" fill="transparent" stroke-dasharray="377" stroke-dashoffset="0" class="text-sky-500 transition-all duration-1000 linear"></circle>
                     </svg>
-                    <div id="countdown" class="absolute inset-0 flex items-center justify-center text-3xl font-bold">35</div>
+                    <div id="countdown" class="absolute inset-0 flex items-center justify-center text-4xl font-bold text-white tracking-tighter">35</div>
                 </div>
-                <h2 class="text-2xl font-bold mb-2">Finalizing Deployment</h2>
-                <p class="text-slate-400 mb-4">We've sent your files. Now waiting for GitHub's servers to process the live page...</p>
-                <div class="flex items-center justify-center space-x-2 text-sky-500">
-                    <div class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-bounce"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-bounce [animation-delay:-0.15s]"></div>
-                    <div class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-bounce [animation-delay:-0.3s]"></div>
+                <h2 class="text-2xl font-bold mb-2 text-white">Finalizing Deployment</h2>
+                <p class="text-slate-400 mb-6 text-sm">We've sent your files. Now waiting for GitHub's servers to process the live page...</p>
+                <div class="flex items-center justify-center space-x-3 text-sky-500">
+                    <div class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></div>
+                    <div class="w-2 h-2 rounded-full bg-sky-500 animate-pulse [animation-delay:0.2s]"></div>
+                    <div class="w-2 h-2 rounded-full bg-sky-500 animate-pulse [animation-delay:0.4s]"></div>
                 </div>
             </div>
 
             <div id="finalState" class="hidden">
-                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-green-500/20">
                     <i class="fas fa-check text-4xl text-white"></i>
                 </div>
-                <h2 class="text-3xl font-bold mb-2">It's Live!</h2>
+                <h2 class="text-3xl font-bold mb-2 text-white">It's Live!</h2>
                 <p class="text-slate-400 mb-8">Your project is now accessible to the world.</p>
-                <a id="finalUrl" href="#" target="_blank" class="block w-full bg-white text-slate-950 font-bold py-4 rounded-xl mb-4 hover:bg-slate-200 transition-colors flex items-center justify-center">
+                <a id="finalUrl" href="#" target="_blank" class="block w-full bg-white text-slate-950 font-bold py-4 rounded-2xl mb-4 hover:bg-slate-100 transition-colors flex items-center justify-center shadow-lg">
                     <i class="fas fa-external-link-alt mr-2"></i> View Website
                 </a>
-                <button onclick="resetApp()" class="text-slate-500 hover:text-white transition underline">Start New Project</button>
+                <button onclick="resetApp()" class="text-slate-500 hover:text-white transition underline text-sm">Start New Project</button>
             </div>
         </div>
     </div>
@@ -181,11 +268,29 @@
         let storedToken = localStorage.getItem('gitfast_token') || '';
         let autoSaveTimer;
         
+        // Theme Logic
+        function syncToggleState() {
+            const checkbox = document.getElementById('themeToggle');
+            checkbox.checked = document.documentElement.classList.contains('dark');
+        }
+
+        function toggleTheme() {
+            const checkbox = document.getElementById('themeToggle');
+            if (checkbox.checked) {
+                document.documentElement.classList.add('dark');
+                localStorage.theme = 'dark';
+            } else {
+                document.documentElement.classList.remove('dark');
+                localStorage.theme = 'light';
+            }
+        }
+
         // UI Logic
         function init() {
+            syncToggleState();
             if (storedToken) {
                 const tokenInput = document.getElementById('ghToken');
-                tokenInput.value = '••••••••••••••••';
+                tokenInput.value = '••••••••••••••••••••••••••••••••';
                 tokenInput.disabled = true;
                 document.getElementById('deleteTokenBtn').classList.remove('hidden');
                 updateAuthBadge(true);
@@ -195,11 +300,11 @@
         function updateAuthBadge(isConfigured) {
             const badge = document.getElementById('authStatus');
             if (isConfigured) {
-                badge.innerText = 'Token: Saved Locally';
-                badge.className = 'text-xs font-medium px-3 py-1 rounded-full bg-green-900/30 text-green-400';
+                badge.innerText = 'TOKEN: SAVED';
+                badge.className = 'hidden md:block text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-green-900/20 text-green-400';
             } else {
-                badge.innerText = 'Token: Not Configured';
-                badge.className = 'text-xs font-medium px-3 py-1 rounded-full bg-slate-800 text-slate-400';
+                badge.innerText = 'TOKEN: NOT SET';
+                badge.className = 'hidden md:block text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full bg-slate-800 text-slate-400';
             }
         }
 
@@ -207,13 +312,12 @@
             clearTimeout(autoSaveTimer);
             const token = val.trim();
             if (token.startsWith('ghp_') && token.length > 20) {
-                // Visual feedback for auto-save
                 showStatus('Saving token...', 'text-sky-400');
                 autoSaveTimer = setTimeout(() => {
                     localStorage.setItem('gitfast_token', token);
                     storedToken = token;
                     init();
-                    showStatus('Token auto-saved!', 'text-green-400');
+                    showStatus('Token auto-saved!', 'text-green-400 font-bold');
                 }, 800);
             }
         }
@@ -226,7 +330,7 @@
             tokenInput.disabled = false;
             document.getElementById('deleteTokenBtn').classList.add('hidden');
             updateAuthBadge(false);
-            showStatus('Token deleted from local storage.', 'text-slate-500');
+            showStatus('Token cleared.', 'text-slate-400');
         }
 
         function updateProgress(percent, label, time) {
@@ -236,10 +340,10 @@
             document.getElementById('timeLeft').innerText = time ? `Est. ${time}` : '';
         }
 
-        function showStatus(msg, color = 'text-slate-500') {
+        function showStatus(msg, color = 'text-slate-400') {
             const el = document.getElementById('statusMessage');
             el.innerText = msg;
-            el.className = `text-sm ${color}`;
+            el.className = `text-xs font-medium ${color}`;
         }
 
         function resetApp() {
@@ -253,7 +357,7 @@
             const deployBtn = document.getElementById('deployBtn');
 
             if (!storedToken) {
-                showStatus('Please enter and save your GitHub token first.', 'text-red-400');
+                showStatus('Please provide a GitHub token.', 'text-red-400');
                 return;
             }
             if (!repo) {
@@ -261,41 +365,36 @@
                 return;
             }
             if (!code) {
-                showStatus('No HTML code detected.', 'text-red-400');
+                showStatus('Source code is empty.', 'text-red-400');
                 return;
             }
 
             deployBtn.disabled = true;
             
             try {
-                // Step 1: Get User Info
-                updateProgress(10, 'Fetching GitHub profile...', '4s');
+                updateProgress(10, 'Syncing with GitHub...', '4s');
                 const userRes = await fetch('https://api.github.com/user', {
                     headers: { 'Authorization': `token ${storedToken}` }
                 });
-                if (!userRes.ok) throw new Error('Invalid Token. Please delete and re-enter.');
+                if (!userRes.ok) throw new Error('Auth failed. Check your token.');
                 const userData = await userRes.json();
                 const owner = userData.login;
 
-                // Step 2: Check if Repo Exists
-                updateProgress(30, 'Verifying repository...', '3s');
+                updateProgress(30, 'Checking repository...', '3s');
                 const checkRepo = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
                     headers: { 'Authorization': `token ${storedToken}` }
                 });
                 
                 if (checkRepo.status === 404) {
-                    updateProgress(40, 'Creating new repository...', '2s');
+                    updateProgress(40, 'Building repository...', '2s');
                     const createRepo = await fetch(`https://api.github.com/user/repos`, {
                         method: 'POST',
                         headers: { 'Authorization': `token ${storedToken}`, 'Content-Type': 'application/json' },
                         body: JSON.stringify({ name: repo, auto_init: true })
                     });
-                    if (!createRepo.ok) throw new Error('Could not create repository.');
-                } else {
-                    updateProgress(40, 'Targeting existing repository...', '2s');
+                    if (!createRepo.ok) throw new Error('Repo creation failed.');
                 }
 
-                // Step 3: Get SHA if index.html exists (to update rather than error)
                 let sha = null;
                 const getFile = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/index.html`, {
                     headers: { 'Authorization': `token ${storedToken}` }
@@ -305,8 +404,7 @@
                     sha = fileData.sha;
                 }
 
-                // Step 4: Upload/Update File
-                updateProgress(70, sha ? 'Updating index.html...' : 'Creating index.html...', '1s');
+                updateProgress(70, sha ? 'Patching index.html...' : 'Creating index.html...', '1s');
                 const upload = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/index.html`, {
                     method: 'PUT',
                     headers: { 
@@ -314,15 +412,14 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: 'Deploy via GitFast',
+                        message: 'Deployed via GitFast',
                         content: btoa(unescape(encodeURIComponent(code))),
                         sha: sha
                     })
                 });
-                if (!upload.ok) throw new Error('Upload failed.');
+                if (!upload.ok) throw new Error('Push failed.');
 
-                // Step 5: Enable Pages (If not enabled)
-                updateProgress(90, 'Ensuring GitHub Pages is live...', '0s');
+                updateProgress(90, 'Activating Pages...', '0s');
                 await fetch(`https://api.github.com/repos/${owner}/${repo}/pages`, {
                     method: 'POST',
                     headers: { 'Authorization': `token ${storedToken}`, 'Accept': 'application/vnd.github.v3+json' },
@@ -332,8 +429,8 @@
                 startCountdown(owner, repo);
 
             } catch (err) {
-                showStatus(err.message, 'text-red-400');
-                updateProgress(0, 'Deployment failed.', '');
+                showStatus(err.message, 'text-red-400 font-bold');
+                updateProgress(0, 'Failed.', '');
                 deployBtn.disabled = false;
             }
         }
