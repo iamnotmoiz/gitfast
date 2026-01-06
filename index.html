@@ -19,225 +19,264 @@
         applyTheme();
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap');
         
         :root {
-            --transition-speed: 0.3s;
-            --transition-curve: cubic-bezier(0.4, 0, 0.2, 1);
+            --ios-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --transition-smooth: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            transition: background-color var(--transition-speed) var(--transition-curve);
+            font-family: -apple-system, 'Inter', sans-serif;
+            transition: background-color var(--transition-smooth);
+            -webkit-font-smoothing: antialiased;
         }
 
         /* --- LIGHT MODE --- */
         body:not(.dark) {
-            background-color: #f8fafc;
-            color: #0f172a;
+            background-color: #f2f2f7; /* iOS Light Background */
+            color: #1c1c1e;
         }
         body:not(.dark) .glass-panel {
             background: rgba(255, 255, 255, 0.8);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
         }
         body:not(.dark) .input-field {
-            background: #ffffff !important;
-            color: #1e293b !important;
-            border: 1px solid #e2e8f0 !important;
+            background: rgba(0, 0, 0, 0.05) !important;
+            color: #1c1c1e !important;
+            border: none !important;
         }
 
-        /* --- DARK MODE (ULTRA DARK) --- */
+        /* --- DARK MODE (iOS-style Deep Dark) --- */
         .dark body {
-            background-color: #05070a;
-            color: #f8fafc;
+            background-color: #000000;
+            color: #ffffff;
         }
         .dark .glass-panel {
-            background: #0d1117 !important;
-            border: 1px solid #1f2937 !important;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            background: rgba(28, 28, 30, 0.7) !important;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
         }
         .dark .input-field {
-            background: #05070a !important; /* Deepest black for fields */
-            color: #f8fafc !important;
-            border: 1px solid #30363d !important;
+            background: rgba(255, 255, 255, 0.08) !important;
+            color: #ffffff !important;
+            border: none !important;
         }
         .dark .input-header {
-            background: #0d1117 !important;
-            border-bottom: 1px solid #30363d !important;
+            background: rgba(44, 44, 46, 0.5) !important;
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1) !important;
         }
-        .dark .nav-container {
-            background: transparent !important;
-            border-bottom: 1px solid #1f2937;
+        .dark .logo-text { color: #ffffff !important; }
+        .dark .brand-icon { background-color: #ffffff; }
+        .dark .brand-icon i { color: #000000 !important; }
+
+        /* --- UI ANIMATIONS & HOVERS --- */
+        .glass-panel {
+            transition: transform 0.3s var(--ios-spring), box-shadow 0.3s ease;
+        }
+        .glass-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
         }
 
-        /* --- EDITOR & UI --- */
+        .btn-primary {
+            background-color: #007aff; /* iOS Blue */
+            transition: all 0.2s var(--ios-spring);
+        }
+        .btn-primary:hover {
+            background-color: #0063cc;
+            transform: scale(1.02);
+        }
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+
+        .input-field {
+            transition: all 0.2s ease;
+        }
+        .input-field:focus {
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
+
         .code-editor {
             font-family: 'Fira Code', monospace;
-            min-height: 100px;
+            min-height: 120px;
             max-height: 500px;
             resize: vertical;
         }
 
+        /* iOS Switch Styles */
         .ios-switch {
             position: relative;
             display: inline-block;
-            width: 44px;
-            height: 24px;
+            width: 51px;
+            height: 31px;
         }
         .ios-switch input { opacity: 0; width: 0; height: 0; }
         .ios-slider {
             position: absolute;
             cursor: pointer;
             top: 0; left: 0; right: 0; bottom: 0;
-            background-color: #cbd5e1;
-            transition: .4s;
+            background-color: #e9e9eb;
+            transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
             border-radius: 34px;
         }
-        .dark .ios-slider { background-color: #1f2937; }
+        .dark .ios-slider { background-color: #39393d; }
         .ios-slider:before {
             position: absolute;
             content: "";
-            height: 18px;
-            width: 18px;
-            left: 3px;
-            bottom: 3px;
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
             background-color: white;
-            transition: .4s;
+            transition: .4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15);
         }
-        .ios-switch input:checked + .ios-slider { background-color: #0ea5e9; }
+        .ios-switch input:checked + .ios-slider { background-color: #34c759; }
         .ios-switch input:checked + .ios-slider:before { transform: translateX(20px); }
 
         ::-webkit-scrollbar { width: 6px; }
-        .dark ::-webkit-scrollbar-track { background: #05070a; }
-        .dark ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
+        .dark ::-webkit-scrollbar-track { background: transparent; }
+        .dark ::-webkit-scrollbar-thumb { background: #3a3a3c; border-radius: 10px; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col antialiased">
+<body class="min-h-screen flex flex-col antialiased overflow-x-hidden">
 
     <!-- Navigation -->
-    <nav class="p-4">
-        <div class="max-w-6xl mx-auto nav-container flex justify-between items-center py-2 transition-colors">
-            <div class="flex items-center space-x-3">
-                <div class="bg-gradient-to-br from-sky-400 to-indigo-600 p-2 rounded-xl">
-                    <i class="fas fa-bolt text-white text-md"></i>
+    <nav class="p-6">
+        <div class="max-w-6xl mx-auto flex justify-between items-center py-2">
+            <div class="flex items-center space-x-3 group cursor-pointer transition-transform active:scale-95">
+                <div class="brand-icon w-10 h-10 flex items-center justify-center rounded-xl shadow-sm transition-all duration-300 bg-sky-500">
+                    <i class="fas fa-bolt text-white text-xl"></i>
                 </div>
-                <span class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-indigo-500">GitFast</span>
+                <span class="logo-text text-2xl font-bold tracking-tight text-slate-900 transition-colors">GitFast</span>
             </div>
             
             <div class="flex items-center space-x-6">
-                <div id="authBadge" class="hidden md:flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all">
-                    <span id="authDot" class="w-1.5 h-1.5 rounded-full"></span>
+                <div id="authBadge" class="hidden md:flex items-center space-x-2 text-[10px] font-semibold uppercase tracking-widest px-4 py-2 rounded-full border border-slate-200 dark:border-white/10 glass-panel">
+                    <span id="authDot" class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
                     <span id="authText">Guest</span>
                 </div>
 
-                <!-- Toggle without background box -->
-                <div class="flex items-center space-x-3 px-2">
-                    <i class="fas fa-sun text-amber-500 text-[10px]"></i>
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-sun text-slate-400 text-[10px]"></i>
                     <label class="ios-switch">
                         <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
                         <span class="ios-slider"></span>
                     </label>
-                    <i class="fas fa-moon text-indigo-400 text-[10px]"></i>
+                    <i class="fas fa-moon text-sky-400 text-[10px]"></i>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow max-w-5xl w-full mx-auto px-4 md:px-8 space-y-4">
+    <main class="flex-grow max-w-5xl w-full mx-auto px-6 pt-4 space-y-6">
         
         <header class="text-center">
-            <h1 class="text-slate-500 dark:text-slate-400 text-sm md:text-base font-bold">
-                Deploy HTML code to <span class="text-sky-500">GitHub</span> instantly.
+            <h1 class="text-slate-500 dark:text-slate-400 text-[12px] font-bold uppercase tracking-[0.3em] animate-pulse">
+                Instant Cloud Deployment
             </h1>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Balanced Input Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
             <!-- Project Name -->
-            <div class="glass-panel p-4 rounded-2xl space-y-2">
-                <div class="flex justify-between items-center">
-                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Repository Name</label>
-                    <span id="repoStatus" class="text-[9px] font-bold px-2 py-0.5 rounded uppercase hidden"></span>
+            <div class="glass-panel p-6 rounded-[24px] flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Project Name</label>
+                    <span id="repoStatus" class="text-[9px] font-bold px-2.5 py-1 rounded-full uppercase hidden transition-all duration-300"></span>
                 </div>
-                <div class="relative">
-                    <i class="fas fa-folder absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                    <input type="text" id="repoName" oninput="checkProjectStatus(this.value)" class="input-field w-full rounded-xl py-2.5 pl-10 pr-4 outline-none transition-all text-sm font-medium" placeholder="my-awesome-site">
+                <div class="relative flex items-center">
+                    <i class="fas fa-folder absolute left-4 text-slate-400 text-sm"></i>
+                    <input type="text" id="repoName" oninput="checkProjectStatus(this.value)" class="input-field h-12 w-full rounded-xl pl-12 pr-4 outline-none text-base font-medium" placeholder="my-web-app">
                 </div>
             </div>
 
             <!-- Access Token -->
-            <div class="glass-panel p-4 rounded-2xl space-y-2">
-                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">GitHub Access Token</label>
-                <div class="flex gap-2">
-                    <div class="relative flex-grow">
-                        <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
-                        <input type="password" id="ghToken" oninput="autoSaveToken(this.value)" class="input-field w-full rounded-xl py-2.5 pl-10 pr-4 outline-none transition-all text-sm font-medium" placeholder="ghp_xxxxxxxxxxxx">
+            <div class="glass-panel p-6 rounded-[24px] flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">GitHub Access Token</label>
+                </div>
+                <div class="flex gap-3">
+                    <div class="relative flex-grow flex items-center">
+                        <i class="fas fa-key absolute left-4 text-slate-400 text-sm"></i>
+                        <input type="password" id="ghToken" oninput="autoSaveToken(this.value)" class="input-field h-12 w-full rounded-xl pl-12 pr-4 outline-none text-base font-medium" placeholder="ghp_xxxxxx">
                     </div>
-                    <button id="deleteTokenBtn" onclick="deleteToken()" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 px-3 rounded-xl transition-all hidden">
-                        <i class="fas fa-trash-alt text-xs"></i>
+                    <button id="deleteTokenBtn" onclick="deleteToken()" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 w-12 rounded-xl transition-all hidden flex items-center justify-center active:scale-90">
+                        <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Editor -->
-        <div class="glass-panel rounded-2xl overflow-hidden flex flex-col shadow-lg">
-            <div class="input-header p-2.5 flex justify-between items-center transition-colors">
-                <div class="flex space-x-1.5 px-2">
-                    <div class="w-2.5 h-2.5 rounded-full bg-rose-500/40"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-amber-500/40"></div>
-                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/40"></div>
+        <!-- Editor Section -->
+        <div class="glass-panel rounded-[24px] overflow-hidden flex flex-col transition-all duration-500">
+            <div class="input-header p-4 flex justify-between items-center">
+                <div class="flex space-x-2 px-1">
+                    <div class="w-3 h-3 rounded-full bg-[#ff5f57] shadow-sm"></div>
+                    <div class="w-3 h-3 rounded-full bg-[#febc2e] shadow-sm"></div>
+                    <div class="w-3 h-3 rounded-full bg-[#28c840] shadow-sm"></div>
                 </div>
-                <span class="text-[9px] font-black tracking-[0.2em] text-slate-500 uppercase">index.html editor</span>
-                <button onclick="document.getElementById('htmlCode').value = ''" class="text-[9px] font-black text-slate-500 hover:text-sky-500 transition-colors uppercase px-2">Clear</button>
+                <span class="text-[10px] font-bold tracking-[0.2em] text-slate-400 uppercase">source.html</span>
+                <button onclick="document.getElementById('htmlCode').value = ''" class="text-[10px] font-bold text-slate-400 hover:text-sky-500 transition-colors uppercase px-2 active:scale-90">Clear</button>
             </div>
-            <textarea id="htmlCode" class="code-editor input-field w-full p-4 text-xs leading-relaxed outline-none bg-transparent border-none !border-0" placeholder="<!-- Paste your HTML here -->
-<!DOCTYPE html>
-<html>
-<body>
-  <h1>Hello World!</h1>
-</body>
-</html>"></textarea>
+            <textarea id="htmlCode" class="code-editor input-field w-full p-6 text-sm leading-relaxed outline-none !bg-transparent border-none !border-0" placeholder="<!-- Paste your HTML here -->"></textarea>
         </div>
 
-        <!-- Footer Actions -->
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-2 pb-6">
-            <p id="statusMessage" class="text-slate-500 text-xs font-bold italic opacity-70">
-                Ready to deploy.
-            </p>
-            <button id="deployBtn" onclick="handleDeploy()" class="w-full md:w-auto bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black py-3.5 px-12 rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center text-sm">
-                <i class="fas fa-paper-plane mr-2"></i>
-                Deploy Project
+        <!-- Action Bar -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 pt-4 pb-12">
+            <div class="flex items-center space-x-3 opacity-60">
+                <div class="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
+                <p id="statusMessage" class="text-slate-500 text-[11px] font-bold uppercase tracking-widest">Ready</p>
+            </div>
+            <button id="deployBtn" onclick="handleDeploy()" class="btn-primary w-full md:w-auto text-white font-bold py-4 px-16 rounded-[20px] shadow-xl shadow-blue-500/20 flex items-center justify-center text-md">
+                <i class="fas fa-cloud-upload-alt mr-3"></i>
+                Deploy Now
             </button>
         </div>
 
-        <!-- Progress -->
-        <div id="progressContainer" class="hidden space-y-2 pb-10">
-            <div class="flex justify-between text-[9px] font-black uppercase">
-                <span id="progressLabel" class="text-sky-500">Processing</span>
-                <span id="timeLeft" class="text-slate-500">Wait...</span>
+        <!-- Progress Indicator -->
+        <div id="progressContainer" class="hidden space-y-3 pb-10 animate-fade-in">
+            <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest">
+                <span id="progressLabel" class="text-sky-500">Syncing...</span>
+                <span id="timeLeft" class="text-slate-500">Please wait</span>
             </div>
-            <div class="w-full bg-slate-200 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden">
-                <div id="progressBar" class="h-full bg-sky-500 transition-all duration-500" style="width: 0%"></div>
+            <div class="w-full bg-slate-200 dark:bg-white/5 h-1.5 rounded-full overflow-hidden">
+                <div id="progressBar" class="h-full bg-sky-500 transition-all duration-1000 ease-out" style="width: 0%"></div>
             </div>
         </div>
     </main>
 
-    <!-- Overlay -->
-    <div id="waitOverlay" class="fixed inset-0 bg-slate-950/98 z-[100] hidden flex items-center justify-center p-8 backdrop-blur-xl">
-        <div class="max-w-md w-full text-center space-y-6">
+    <!-- Success/Wait Overlay -->
+    <div id="waitOverlay" class="fixed inset-0 bg-black/90 z-[100] hidden flex items-center justify-center p-8 backdrop-blur-2xl transition-all duration-500">
+        <div class="max-w-md w-full text-center space-y-8 animate-ios-entry">
             <div id="waitingState">
-                <div id="countdown" class="text-7xl font-black text-white tracking-tighter mb-4">35</div>
-                <h2 class="text-xl font-bold text-white">Configuring GitHub Pages</h2>
-                <p class="text-slate-500 text-xs">Waiting for deployment to propagate...</p>
+                <div id="countdown" class="text-8xl font-black text-white tracking-tighter mb-4 opacity-20">35</div>
+                <h2 class="text-2xl font-bold text-white tracking-tight">Propagating Changes</h2>
+                <p class="text-slate-500 text-sm">Building your production environment...</p>
+                <div class="mt-8 flex justify-center">
+                    <div class="w-12 h-1 bg-white/10 rounded-full overflow-hidden">
+                        <div class="h-full bg-white w-1/3 animate-loading-bar"></div>
+                    </div>
+                </div>
             </div>
-            <div id="finalState" class="hidden space-y-6">
-                <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto">
+            <div id="finalState" class="hidden space-y-8">
+                <div class="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-green-500/30">
                     <i class="fas fa-check text-3xl text-white"></i>
                 </div>
-                <h2 class="text-3xl font-black text-white">Live!</h2>
-                <a id="finalUrl" href="#" target="_blank" class="block w-full bg-white text-black font-black py-4 rounded-xl hover:bg-slate-100 transition-all">View Site</a>
-                <button onclick="resetApp()" class="text-slate-500 hover:text-white text-[10px] font-black uppercase">New Project</button>
+                <div class="space-y-2">
+                    <h2 class="text-3xl font-bold text-white tracking-tight">Success!</h2>
+                    <p class="text-slate-400 text-sm">Your site is live globally.</p>
+                </div>
+                <a id="finalUrl" href="#" target="_blank" class="block w-full bg-white text-black font-bold py-5 rounded-2xl hover:bg-slate-100 transition-all text-sm uppercase tracking-widest active:scale-95">Launch Project</a>
+                <button onclick="resetApp()" class="text-slate-500 hover:text-white text-[11px] font-bold uppercase tracking-widest transition-colors">Start New Project</button>
             </div>
         </div>
     </div>
@@ -271,18 +310,17 @@
             }
             statusTimer = setTimeout(async () => {
                 indicator.classList.remove('hidden');
-                indicator.innerText = 'Checking...';
-                indicator.className = 'text-[9px] font-bold px-2 py-0.5 rounded uppercase bg-slate-200 dark:bg-slate-900 text-slate-500';
+                indicator.innerText = '···';
                 try {
                     const userRes = await fetch('https://api.github.com/user', { headers: { 'Authorization': `token ${storedToken}` } });
                     const userData = await userRes.json();
                     const check = await fetch(`https://api.github.com/repos/${userData.login}/${name.trim().toLowerCase()}`, { headers: { 'Authorization': `token ${storedToken}` } });
                     if (check.ok) {
-                        indicator.innerText = 'Exists';
-                        indicator.className = 'text-[9px] font-bold px-2 py-0.5 rounded uppercase bg-sky-500/10 text-sky-500';
+                        indicator.innerText = 'Existing';
+                        indicator.className = 'text-[9px] font-bold px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-500';
                     } else {
                         indicator.innerText = 'Available';
-                        indicator.className = 'text-[9px] font-bold px-2 py-0.5 rounded uppercase bg-emerald-500/10 text-emerald-500';
+                        indicator.className = 'text-[9px] font-bold px-2.5 py-1 rounded-full bg-green-500/10 text-green-500';
                     }
                 } catch (e) { indicator.classList.add('hidden'); }
             }, 600);
@@ -304,13 +342,9 @@
             const d = document.getElementById('authDot');
             const t = document.getElementById('authText');
             if (active) {
-                b.className = 'hidden md:flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border-emerald-500/30 text-emerald-500 bg-emerald-500/5';
-                d.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+                b.className = 'hidden md:flex items-center space-x-2 text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full border border-green-500/30 text-green-500 bg-green-500/5 transition-all duration-500';
+                d.className = 'w-1.5 h-1.5 rounded-full bg-green-500 shadow-sm shadow-green-500/50';
                 t.innerText = 'Connected';
-            } else {
-                b.className = 'hidden md:flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border-slate-300 dark:border-slate-800 text-slate-500';
-                d.className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
-                t.innerText = 'Guest';
             }
         }
 
@@ -334,9 +368,7 @@
             const code = document.getElementById('htmlCode').value.trim();
             const repo = document.getElementById('repoName').value.trim().toLowerCase().replace(/\s+/g, '-');
             const btn = document.getElementById('deployBtn');
-
             if (!storedToken || !repo || !code) return;
-
             btn.disabled = true;
             document.getElementById('progressContainer').classList.remove('hidden');
             
@@ -344,7 +376,6 @@
                 const userRes = await fetch('https://api.github.com/user', { headers: { 'Authorization': `token ${storedToken}` } });
                 const userData = await userRes.json();
                 const owner = userData.login;
-
                 const checkRepo = await fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers: { 'Authorization': `token ${storedToken}` } });
                 if (checkRepo.status === 404) {
                     await fetch('https://api.github.com/user/repos', {
@@ -353,27 +384,19 @@
                         body: JSON.stringify({ name: repo, auto_init: true })
                     });
                 }
-
                 let sha = null;
                 const getF = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/index.html`, { headers: { 'Authorization': `token ${storedToken}` } });
                 if (getF.ok) sha = (await getF.json()).sha;
-
                 await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/index.html`, {
                     method: 'PUT',
                     headers: { 'Authorization': `token ${storedToken}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: '⚡ GitFast Deploy',
-                        content: btoa(unescape(encodeURIComponent(code))),
-                        sha: sha
-                    })
+                    body: JSON.stringify({ message: '⚡ GitFast Deploy', content: btoa(unescape(encodeURIComponent(code))), sha: sha })
                 });
-
                 await fetch(`https://api.github.com/repos/${owner}/${repo}/pages`, {
                     method: 'POST',
                     headers: { 'Authorization': `token ${storedToken}`, 'Accept': 'application/vnd.github.v3+json' },
                     body: JSON.stringify({ source: { branch: 'main', path: '/' } })
                 }).catch(() => {});
-
                 startFinalSequence(owner, repo);
             } catch (e) {
                 alert('Error: ' + e.message);
@@ -399,5 +422,19 @@
 
         init();
     </script>
+
+    <style>
+        @keyframes loading-bar {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(300%); }
+        }
+        .animate-loading-bar { animation: loading-bar 1.5s infinite ease-in-out; }
+        
+        @keyframes ios-entry {
+            from { opacity: 0; transform: scale(1.1); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-ios-entry { animation: ios-entry 0.6s var(--ios-spring); }
+    </style>
 </body>
 </html>
