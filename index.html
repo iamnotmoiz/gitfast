@@ -7,14 +7,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script>
-        /**
-         * Enhanced Theme Engine
-         * Prioritizes saved user preference, then falls back to system settings.
-         */
         function applyTheme() {
             const savedTheme = localStorage.getItem('theme');
             const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            
             if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
                 document.documentElement.classList.add('dark');
             } else {
@@ -27,91 +22,69 @@
         @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
         
         :root {
-            --transition-speed: 0.4s;
+            --transition-speed: 0.3s;
             --transition-curve: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
-            transition: background-color var(--transition-speed) var(--transition-curve), 
-                        color var(--transition-speed) var(--transition-curve);
+            transition: background-color var(--transition-speed) var(--transition-curve);
         }
 
         /* --- LIGHT MODE --- */
         body:not(.dark) {
             background-color: #f8fafc;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(210,100%,98%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 100%, hsla(210,100%,96%,1) 0, transparent 50%);
             color: #0f172a;
         }
-
         body:not(.dark) .glass-panel {
             background: rgba(255, 255, 255, 0.8);
             border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.04);
-            backdrop-filter: blur(20px);
         }
-
         body:not(.dark) .input-field {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            color: #1e293b;
+            background: #ffffff !important;
+            color: #1e293b !important;
+            border: 1px solid #e2e8f0 !important;
         }
 
-        body:not(.dark) .input-header {
-            background: rgba(248, 250, 252, 0.8);
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        /* --- DARK MODE (Deep Onyx & Slate) --- */
+        /* --- DARK MODE (ULTRA DARK) --- */
         .dark body {
-            background-color: #05070a; /* True Deep Black-Blue */
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(220, 40%, 8%, 1) 0, transparent 50%), 
-                radial-gradient(at 100% 100%, hsla(220, 30%, 5%, 1) 0, transparent 50%);
-            color: #e2e8f0;
+            background-color: #05070a;
+            color: #f8fafc;
         }
-
         .dark .glass-panel {
-            background: rgba(13, 17, 23, 0.8);
-            border: 1px solid rgba(30, 41, 59, 0.7);
-            box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(20px);
+            background: #0d1117 !important;
+            border: 1px solid #1f2937 !important;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
         }
-
         .dark .input-field {
-            background: #0d1117;
-            border: 1px solid #30363d;
-            color: #f0f6fc;
+            background: #05070a !important; /* Deepest black for fields */
+            color: #f8fafc !important;
+            border: 1px solid #30363d !important;
         }
-
-        .dark .input-field:focus {
-            border-color: #38bdf8;
-            box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
-        }
-
         .dark .input-header {
-            background: #161b22;
-            border-bottom: 1px solid #30363d;
+            background: #0d1117 !important;
+            border-bottom: 1px solid #30363d !important;
+        }
+        .dark .nav-container {
+            background: transparent !important;
+            border-bottom: 1px solid #1f2937;
         }
 
-        /* --- COMMON UI --- */
+        /* --- EDITOR & UI --- */
         .code-editor {
             font-family: 'Fira Code', monospace;
-            min-height: 250px;
-            transition: all 0.3s ease;
+            min-height: 100px;
+            max-height: 500px;
+            resize: vertical;
         }
 
         .ios-switch {
             position: relative;
             display: inline-block;
-            width: 50px;
-            height: 26px;
+            width: 44px;
+            height: 24px;
         }
-
         .ios-switch input { opacity: 0; width: 0; height: 0; }
-
         .ios-slider {
             position: absolute;
             cursor: pointer;
@@ -120,119 +93,105 @@
             transition: .4s;
             border-radius: 34px;
         }
-
-        .dark .ios-slider { background-color: #334155; }
-
+        .dark .ios-slider { background-color: #1f2937; }
         .ios-slider:before {
             position: absolute;
             content: "";
-            height: 20px;
-            width: 20px;
+            height: 18px;
+            width: 18px;
             left: 3px;
             bottom: 3px;
             background-color: white;
             transition: .4s;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
-
         .ios-switch input:checked + .ios-slider { background-color: #0ea5e9; }
-        .ios-switch input:checked + .ios-slider:before { transform: translateX(24px); }
+        .ios-switch input:checked + .ios-slider:before { transform: translateX(20px); }
 
-        .badge-pulse {
-            animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-
-        @keyframes pulse-ring {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-
-        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar { width: 6px; }
         .dark ::-webkit-scrollbar-track { background: #05070a; }
         .dark ::-webkit-scrollbar-thumb { background: #30363d; border-radius: 10px; }
-        body:not(.dark) ::-webkit-scrollbar-track { background: #f1f5f9; }
-        body:not(.dark) ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col antialiased">
 
     <!-- Navigation -->
-    <nav class="sticky top-0 z-50 p-4">
-        <div class="max-w-6xl mx-auto glass-panel rounded-2xl px-6 py-3 flex justify-between items-center">
+    <nav class="p-4">
+        <div class="max-w-6xl mx-auto nav-container flex justify-between items-center py-2 transition-colors">
             <div class="flex items-center space-x-3">
-                <div class="bg-gradient-to-br from-sky-400 to-indigo-600 p-2 rounded-xl shadow-lg">
-                    <i class="fas fa-bolt text-white text-lg"></i>
+                <div class="bg-gradient-to-br from-sky-400 to-indigo-600 p-2 rounded-xl">
+                    <i class="fas fa-bolt text-white text-md"></i>
                 </div>
-                <span class="text-2xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-indigo-500">GitFast</span>
+                <span class="text-xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-sky-500 to-indigo-500">GitFast</span>
             </div>
             
             <div class="flex items-center space-x-6">
-                <div id="authBadge" class="hidden md:flex items-center space-x-2 text-[10px] font-extrabold uppercase tracking-widest px-4 py-2 rounded-full border transition-colors duration-300">
-                    <span id="authDot" class="w-2 h-2 rounded-full"></span>
-                    <span id="authText">Guest Mode</span>
+                <div id="authBadge" class="hidden md:flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border transition-all">
+                    <span id="authDot" class="w-1.5 h-1.5 rounded-full"></span>
+                    <span id="authText">Guest</span>
                 </div>
 
-                <div class="flex items-center space-x-3 bg-slate-200/50 dark:bg-slate-800/50 p-1.5 rounded-full px-4 transition-colors">
-                    <i class="fas fa-sun text-amber-500 text-xs"></i>
+                <!-- Toggle without background box -->
+                <div class="flex items-center space-x-3 px-2">
+                    <i class="fas fa-sun text-amber-500 text-[10px]"></i>
                     <label class="ios-switch">
                         <input type="checkbox" id="themeToggle" onchange="toggleTheme()">
                         <span class="ios-slider"></span>
                     </label>
-                    <i class="fas fa-moon text-indigo-400 text-xs"></i>
+                    <i class="fas fa-moon text-indigo-400 text-[10px]"></i>
                 </div>
             </div>
         </div>
     </nav>
 
-    <main class="flex-grow max-w-5xl w-full mx-auto p-4 md:p-8 space-y-8">
+    <main class="flex-grow max-w-5xl w-full mx-auto px-4 md:px-8 space-y-4">
         
-        <header class="text-center py-2">
-            <h1 class="text-slate-500 dark:text-slate-400 text-lg md:text-xl font-semibold tracking-wide">
-                Deploy any HTML code to a live <span class="text-sky-500">GitHub URL</span> instantly.
+        <header class="text-center">
+            <h1 class="text-slate-500 dark:text-slate-400 text-sm md:text-base font-bold">
+                Deploy HTML code to <span class="text-sky-500">GitHub</span> instantly.
             </h1>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Project Name -->
-            <div class="glass-panel p-6 rounded-3xl space-y-4">
+            <div class="glass-panel p-4 rounded-2xl space-y-2">
                 <div class="flex justify-between items-center">
-                    <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">Project Repository</label>
-                    <span id="repoStatus" class="text-[10px] font-bold px-2 py-0.5 rounded uppercase hidden"></span>
+                    <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Repository Name</label>
+                    <span id="repoStatus" class="text-[9px] font-bold px-2 py-0.5 rounded uppercase hidden"></span>
                 </div>
                 <div class="relative">
-                    <i class="fas fa-folder absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                    <input type="text" id="repoName" oninput="checkProjectStatus(this.value)" class="input-field w-full rounded-2xl py-4 pl-12 pr-4 outline-none transition-all font-medium" placeholder="my-awesome-site">
+                    <i class="fas fa-folder absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                    <input type="text" id="repoName" oninput="checkProjectStatus(this.value)" class="input-field w-full rounded-xl py-2.5 pl-10 pr-4 outline-none transition-all text-sm font-medium" placeholder="my-awesome-site">
                 </div>
             </div>
 
             <!-- Access Token -->
-            <div class="glass-panel p-6 rounded-3xl space-y-4">
-                <label class="text-[11px] font-black text-slate-400 uppercase tracking-widest">GitHub Access Token</label>
-                <div class="flex gap-3">
+            <div class="glass-panel p-4 rounded-2xl space-y-2">
+                <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest">GitHub Access Token</label>
+                <div class="flex gap-2">
                     <div class="relative flex-grow">
-                        <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                        <input type="password" id="ghToken" oninput="autoSaveToken(this.value)" class="input-field w-full rounded-2xl py-4 pl-12 pr-4 outline-none transition-all font-medium" placeholder="ghp_xxxxxxxxxxxx">
+                        <i class="fas fa-key absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 text-xs"></i>
+                        <input type="password" id="ghToken" oninput="autoSaveToken(this.value)" class="input-field w-full rounded-xl py-2.5 pl-10 pr-4 outline-none transition-all text-sm font-medium" placeholder="ghp_xxxxxxxxxxxx">
                     </div>
-                    <button id="deleteTokenBtn" onclick="deleteToken()" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 p-4 rounded-2xl transition-all hidden">
-                        <i class="fas fa-trash-alt"></i>
+                    <button id="deleteTokenBtn" onclick="deleteToken()" class="bg-red-500/10 hover:bg-red-500/20 text-red-500 px-3 rounded-xl transition-all hidden">
+                        <i class="fas fa-trash-alt text-xs"></i>
                     </button>
                 </div>
             </div>
         </div>
 
         <!-- Editor -->
-        <div class="glass-panel rounded-3xl overflow-hidden flex flex-col shadow-2xl">
-            <div class="input-header p-4 flex justify-between items-center transition-colors">
-                <div class="flex space-x-2">
-                    <div class="w-3 h-3 rounded-full bg-rose-500/30 border border-rose-500/50"></div>
-                    <div class="w-3 h-3 rounded-full bg-amber-500/30 border border-amber-500/50"></div>
-                    <div class="w-3 h-3 rounded-full bg-emerald-500/30 border border-emerald-500/50"></div>
+        <div class="glass-panel rounded-2xl overflow-hidden flex flex-col shadow-lg">
+            <div class="input-header p-2.5 flex justify-between items-center transition-colors">
+                <div class="flex space-x-1.5 px-2">
+                    <div class="w-2.5 h-2.5 rounded-full bg-rose-500/40"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-amber-500/40"></div>
+                    <div class="w-2.5 h-2.5 rounded-full bg-emerald-500/40"></div>
                 </div>
-                <span class="text-[11px] font-bold tracking-widest text-slate-400 uppercase">index.html editor</span>
-                <button onclick="document.getElementById('htmlCode').value = ''" class="text-xs font-bold text-slate-400 hover:text-sky-500 transition-colors uppercase">Clear All</button>
+                <span class="text-[9px] font-black tracking-[0.2em] text-slate-500 uppercase">index.html editor</span>
+                <button onclick="document.getElementById('htmlCode').value = ''" class="text-[9px] font-black text-slate-500 hover:text-sky-500 transition-colors uppercase px-2">Clear</button>
             </div>
-            <textarea id="htmlCode" class="code-editor w-full p-8 text-sm leading-relaxed outline-none bg-transparent dark:text-blue-100" placeholder="<!-- Paste your HTML here -->
+            <textarea id="htmlCode" class="code-editor input-field w-full p-4 text-xs leading-relaxed outline-none bg-transparent border-none !border-0" placeholder="<!-- Paste your HTML here -->
 <!DOCTYPE html>
 <html>
 <body>
@@ -241,60 +200,44 @@
 </html>"></textarea>
         </div>
 
-        <!-- Progress Container -->
-        <div id="progressContainer" class="hidden space-y-3 px-2">
-            <div class="flex justify-between text-[11px] font-black uppercase tracking-tighter">
-                <span id="progressLabel" class="text-sky-500">Deploying...</span>
-                <span id="timeLeft" class="text-slate-400">Please wait</span>
-            </div>
-            <div class="w-full bg-slate-200 dark:bg-slate-800 h-3 rounded-full overflow-hidden">
-                <div id="progressBar" class="h-full rounded-full bg-gradient-to-r from-sky-400 via-indigo-500 to-sky-400 bg-[length:200%_auto] animate-[gradient_2s_linear_infinite] transition-all duration-500" style="width: 0%"></div>
-            </div>
-        </div>
-
         <!-- Footer Actions -->
-        <div class="flex flex-col md:flex-row items-center justify-between gap-6 pt-4 pb-16">
-            <p id="statusMessage" class="text-slate-400 text-sm font-medium italic opacity-80">
-                Ready to push your code live.
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 pt-2 pb-6">
+            <p id="statusMessage" class="text-slate-500 text-xs font-bold italic opacity-70">
+                Ready to deploy.
             </p>
-            <button id="deployBtn" onclick="handleDeploy()" class="w-full md:w-auto bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-bold py-5 px-20 rounded-2xl transition-all shadow-xl shadow-sky-500/25 active:scale-95 flex items-center justify-center group">
-                <i class="fas fa-paper-plane mr-3 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform"></i>
+            <button id="deployBtn" onclick="handleDeploy()" class="w-full md:w-auto bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-400 hover:to-indigo-500 text-white font-black py-3.5 px-12 rounded-xl transition-all shadow-lg active:scale-95 flex items-center justify-center text-sm">
+                <i class="fas fa-paper-plane mr-2"></i>
                 Deploy Project
             </button>
         </div>
+
+        <!-- Progress -->
+        <div id="progressContainer" class="hidden space-y-2 pb-10">
+            <div class="flex justify-between text-[9px] font-black uppercase">
+                <span id="progressLabel" class="text-sky-500">Processing</span>
+                <span id="timeLeft" class="text-slate-500">Wait...</span>
+            </div>
+            <div class="w-full bg-slate-200 dark:bg-slate-900 h-1.5 rounded-full overflow-hidden">
+                <div id="progressBar" class="h-full bg-sky-500 transition-all duration-500" style="width: 0%"></div>
+            </div>
+        </div>
     </main>
 
-    <!-- Overlays -->
+    <!-- Overlay -->
     <div id="waitOverlay" class="fixed inset-0 bg-slate-950/98 z-[100] hidden flex items-center justify-center p-8 backdrop-blur-xl">
-        <div class="max-w-md w-full text-center space-y-10">
+        <div class="max-w-md w-full text-center space-y-6">
             <div id="waitingState">
-                <div class="relative w-40 h-40 mx-auto mb-8">
-                    <svg class="w-full h-full transform -rotate-90">
-                        <circle cx="80" cy="80" r="76" stroke="currentColor" stroke-width="2" fill="transparent" class="text-slate-900"></circle>
-                        <circle id="timerCircle" cx="80" cy="80" r="76" stroke="currentColor" stroke-width="4" fill="transparent" stroke-dasharray="477" stroke-dashoffset="0" class="text-sky-500 transition-all duration-1000 linear"></circle>
-                    </svg>
-                    <div id="countdown" class="absolute inset-0 flex items-center justify-center text-6xl font-black text-white tracking-tighter">35</div>
-                </div>
-                <div class="space-y-2">
-                    <h2 class="text-2xl font-extrabold text-white">Syncing with GitHub Pages</h2>
-                    <p class="text-slate-400 text-sm">Please stay on this page while we finalize your live URL.</p>
-                </div>
+                <div id="countdown" class="text-7xl font-black text-white tracking-tighter mb-4">35</div>
+                <h2 class="text-xl font-bold text-white">Configuring GitHub Pages</h2>
+                <p class="text-slate-500 text-xs">Waiting for deployment to propagate...</p>
             </div>
-
-            <div id="finalState" class="hidden space-y-8">
-                <div class="w-24 h-24 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center mx-auto shadow-2xl shadow-emerald-500/30">
-                    <i class="fas fa-check text-4xl text-white"></i>
+            <div id="finalState" class="hidden space-y-6">
+                <div class="w-20 h-20 bg-emerald-500 rounded-full flex items-center justify-center mx-auto">
+                    <i class="fas fa-check text-3xl text-white"></i>
                 </div>
-                <div class="space-y-2">
-                    <h2 class="text-4xl font-black text-white tracking-tight">Deployment Success</h2>
-                    <p class="text-slate-400">Your site is live and reachable.</p>
-                </div>
-                <div class="space-y-4">
-                    <a id="finalUrl" href="#" target="_blank" class="block w-full bg-white text-slate-950 font-black py-5 rounded-2xl hover:bg-slate-100 transition-all shadow-xl flex items-center justify-center">
-                        <i class="fas fa-globe mr-3 text-sky-500"></i> Open Live Site
-                    </a>
-                    <button onclick="resetApp()" class="text-slate-500 hover:text-white transition-colors text-xs font-black uppercase tracking-widest">New Deployment</button>
-                </div>
+                <h2 class="text-3xl font-black text-white">Live!</h2>
+                <a id="finalUrl" href="#" target="_blank" class="block w-full bg-white text-black font-black py-4 rounded-xl hover:bg-slate-100 transition-all">View Site</a>
+                <button onclick="resetApp()" class="text-slate-500 hover:text-white text-[10px] font-black uppercase">New Project</button>
             </div>
         </div>
     </div>
@@ -302,9 +245,7 @@
     <script>
         let storedToken = localStorage.getItem('gitfast_token') || '';
         let statusTimer;
-        let authTimer;
 
-        // Theme Persistence
         function syncToggleState() {
             const checkbox = document.getElementById('themeToggle');
             checkbox.checked = document.documentElement.classList.contains('dark');
@@ -321,106 +262,70 @@
             }
         }
 
-        // Project Status Engine
         async function checkProjectStatus(name) {
             const indicator = document.getElementById('repoStatus');
             clearTimeout(statusTimer);
-
-            if (!name || name.length < 3) {
+            if (!name || name.length < 3 || !storedToken) {
                 indicator.classList.add('hidden');
                 return;
             }
-
-            if (!storedToken) return;
-
             statusTimer = setTimeout(async () => {
                 indicator.classList.remove('hidden');
                 indicator.innerText = 'Checking...';
-                indicator.className = 'text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-slate-200 dark:bg-slate-800 text-slate-500';
-
+                indicator.className = 'text-[9px] font-bold px-2 py-0.5 rounded uppercase bg-slate-200 dark:bg-slate-900 text-slate-500';
                 try {
-                    const userRes = await fetch('https://api.github.com/user', {
-                        headers: { 'Authorization': `token ${storedToken}` }
-                    });
+                    const userRes = await fetch('https://api.github.com/user', { headers: { 'Authorization': `token ${storedToken}` } });
                     const userData = await userRes.json();
-                    const check = await fetch(`https://api.github.com/repos/${userData.login}/${name.trim().toLowerCase()}`, {
-                        headers: { 'Authorization': `token ${storedToken}` }
-                    });
-
+                    const check = await fetch(`https://api.github.com/repos/${userData.login}/${name.trim().toLowerCase()}`, { headers: { 'Authorization': `token ${storedToken}` } });
                     if (check.ok) {
-                        indicator.innerText = 'Already existing project';
-                        indicator.className = 'text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-emerald-500/10 text-emerald-500 border border-emerald-500/20';
+                        indicator.innerText = 'Exists';
+                        indicator.className = 'text-[9px] font-bold px-2 py-0.5 rounded uppercase bg-sky-500/10 text-sky-500';
                     } else {
-                        indicator.innerText = 'New project name';
-                        indicator.className = 'text-[10px] font-bold px-2 py-0.5 rounded uppercase bg-orange-500/10 text-orange-500 border border-orange-500/20';
+                        indicator.innerText = 'Available';
+                        indicator.className = 'text-[9px] font-bold px-2 py-0.5 rounded uppercase bg-emerald-500/10 text-emerald-500';
                     }
-                } catch (e) {
-                    indicator.classList.add('hidden');
-                }
-            }, 500);
+                } catch (e) { indicator.classList.add('hidden'); }
+            }, 600);
         }
 
         function init() {
             syncToggleState();
             if (storedToken) {
-                const tokenInput = document.getElementById('ghToken');
-                tokenInput.value = '••••••••••••••••••••••••••••••••';
-                tokenInput.disabled = true;
+                const ti = document.getElementById('ghToken');
+                ti.value = '••••••••••••••••••••••••••••••••';
+                ti.disabled = true;
                 document.getElementById('deleteTokenBtn').classList.remove('hidden');
                 updateAuthBadge(true);
             }
         }
 
         function updateAuthBadge(active) {
-            const badge = document.getElementById('authBadge');
-            const dot = document.getElementById('authDot');
-            const txt = document.getElementById('authText');
-
+            const b = document.getElementById('authBadge');
+            const d = document.getElementById('authDot');
+            const t = document.getElementById('authText');
             if (active) {
-                badge.className = 'hidden md:flex items-center space-x-2 text-[10px] font-extrabold uppercase tracking-widest px-4 py-2 rounded-full border-emerald-500/30 bg-emerald-500/5 text-emerald-500';
-                dot.className = 'w-2 h-2 rounded-full bg-emerald-500 badge-pulse';
-                txt.innerText = 'GitHub Connected';
+                b.className = 'hidden md:flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border-emerald-500/30 text-emerald-500 bg-emerald-500/5';
+                d.className = 'w-1.5 h-1.5 rounded-full bg-emerald-500';
+                t.innerText = 'Connected';
             } else {
-                badge.className = 'hidden md:flex items-center space-x-2 text-[10px] font-extrabold uppercase tracking-widest px-4 py-2 rounded-full border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-400';
-                dot.className = 'w-2 h-2 rounded-full bg-slate-400';
-                txt.innerText = 'Token Required';
+                b.className = 'hidden md:flex items-center space-x-2 text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border-slate-300 dark:border-slate-800 text-slate-500';
+                d.className = 'w-1.5 h-1.5 rounded-full bg-slate-400';
+                t.innerText = 'Guest';
             }
         }
 
         function autoSaveToken(val) {
-            clearTimeout(authTimer);
             if (val.trim().startsWith('ghp_')) {
-                showStatus('Validating token...', 'text-sky-500');
-                authTimer = setTimeout(() => {
-                    localStorage.setItem('gitfast_token', val.trim());
-                    storedToken = val.trim();
-                    init();
-                    showStatus('Authentication successful.', 'text-emerald-500 font-bold');
-                }, 800);
+                localStorage.setItem('gitfast_token', val.trim());
+                storedToken = val.trim();
+                init();
             }
         }
 
         function deleteToken() {
             localStorage.removeItem('gitfast_token');
             storedToken = '';
-            const ti = document.getElementById('ghToken');
-            ti.value = ''; ti.disabled = false;
-            document.getElementById('deleteTokenBtn').classList.add('hidden');
-            document.getElementById('repoStatus').classList.add('hidden');
-            updateAuthBadge(false);
-        }
-
-        function showStatus(msg, color) {
-            const el = document.getElementById('statusMessage');
-            el.innerText = msg;
-            el.className = `text-sm font-medium italic ${color}`;
-        }
-
-        function updateProgress(perc, label, time) {
-            document.getElementById('progressContainer').classList.remove('hidden');
-            document.getElementById('progressBar').style.width = perc + '%';
-            document.getElementById('progressLabel').innerText = label;
-            document.getElementById('timeLeft').innerText = time ? 'Time: ' + time : '';
+            location.reload();
         }
 
         function resetApp() { location.reload(); }
@@ -430,25 +335,17 @@
             const repo = document.getElementById('repoName').value.trim().toLowerCase().replace(/\s+/g, '-');
             const btn = document.getElementById('deployBtn');
 
-            if (!storedToken || !repo || !code) {
-                showStatus('Missing requirements.', 'text-rose-500');
-                return;
-            }
+            if (!storedToken || !repo || !code) return;
 
             btn.disabled = true;
+            document.getElementById('progressContainer').classList.remove('hidden');
+            
             try {
-                updateProgress(20, 'Connecting...', '4s');
-                const userRes = await fetch('https://api.github.com/user', {
-                    headers: { 'Authorization': `token ${storedToken}` }
-                });
+                const userRes = await fetch('https://api.github.com/user', { headers: { 'Authorization': `token ${storedToken}` } });
                 const userData = await userRes.json();
                 const owner = userData.login;
 
-                updateProgress(40, 'Preparing Repository...', '3s');
-                const checkRepo = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
-                    headers: { 'Authorization': `token ${storedToken}` }
-                });
-
+                const checkRepo = await fetch(`https://api.github.com/repos/${owner}/${repo}`, { headers: { 'Authorization': `token ${storedToken}` } });
                 if (checkRepo.status === 404) {
                     await fetch('https://api.github.com/user/repos', {
                         method: 'POST',
@@ -458,23 +355,19 @@
                 }
 
                 let sha = null;
-                const getF = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/index.html`, {
-                    headers: { 'Authorization': `token ${storedToken}` }
-                });
+                const getF = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/index.html`, { headers: { 'Authorization': `token ${storedToken}` } });
                 if (getF.ok) sha = (await getF.json()).sha;
 
-                updateProgress(70, 'Pushing Assets...', '1s');
                 await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/index.html`, {
                     method: 'PUT',
                     headers: { 'Authorization': `token ${storedToken}`, 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        message: 'Deploy via GitFast ⚡',
+                        message: '⚡ GitFast Deploy',
                         content: btoa(unescape(encodeURIComponent(code))),
                         sha: sha
                     })
                 });
 
-                updateProgress(95, 'Propagating DNS...', '0s');
                 await fetch(`https://api.github.com/repos/${owner}/${repo}/pages`, {
                     method: 'POST',
                     headers: { 'Authorization': `token ${storedToken}`, 'Accept': 'application/vnd.github.v3+json' },
@@ -482,9 +375,8 @@
                 }).catch(() => {});
 
                 startFinalSequence(owner, repo);
-
             } catch (e) {
-                showStatus('Deployment error: ' + e.message, 'text-rose-500');
+                alert('Error: ' + e.message);
                 btn.disabled = false;
             }
         }
@@ -492,15 +384,10 @@
         function startFinalSequence(owner, repo) {
             document.getElementById('waitOverlay').classList.remove('hidden');
             let sec = 35;
-            const circle = document.getElementById('timerCircle');
             const count = document.getElementById('countdown');
-            const dash = 477;
-
             const int = setInterval(() => {
                 sec--;
                 count.innerText = sec;
-                circle.style.strokeDashoffset = dash - (sec / 35) * dash;
-
                 if (sec <= 0) {
                     clearInterval(int);
                     document.getElementById('waitingState').classList.add('hidden');
