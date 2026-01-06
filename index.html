@@ -205,7 +205,8 @@
                 </div>
                 <div class="relative flex items-center">
                     <i class="fas fa-folder absolute left-4 text-slate-400 text-sm"></i>
-                    <input type="text" id="repoName" oninput="checkProjectStatus(this.value)" class="input-field h-12 w-full rounded-xl pl-12 pr-4 outline-none text-base font-medium" placeholder="my-web-app">
+                    <!-- Added autocomplete="off" and spellcheck="false" to prevent password prompts -->
+                    <input type="text" id="repoName" name="project_id" autocomplete="off" spellcheck="false" oninput="checkProjectStatus(this.value)" class="input-field h-12 w-full rounded-xl pl-12 pr-4 outline-none text-base font-medium" placeholder="my-web-app">
                 </div>
             </div>
 
@@ -344,6 +345,10 @@
                 document.getElementById('deleteTokenBtn').classList.remove('hidden');
                 updateAuthBadge(true);
             }
+            // Request notification permission early
+            if ("Notification" in window && Notification.permission === "default") {
+                Notification.requestPermission();
+            }
         }
 
         function updateAuthBadge(active) {
@@ -374,6 +379,11 @@
         function resetApp() { location.reload(); }
 
         async function handleDeploy() {
+            // Re-request permission if they haven't decided yet
+            if ("Notification" in window && Notification.permission === "default") {
+                await Notification.requestPermission();
+            }
+
             const code = document.getElementById('htmlCode').value.trim();
             const repo = document.getElementById('repoName').value.trim().toLowerCase().replace(/\s+/g, '-');
             const btn = document.getElementById('deployBtn');
@@ -417,6 +427,8 @@
             document.getElementById('waitOverlay').classList.remove('hidden');
             let sec = 35;
             const count = document.getElementById('countdown');
+            const targetUrl = `https://${owner}.github.io/${repo}/`;
+            
             const int = setInterval(() => {
                 sec--;
                 count.innerText = sec;
@@ -424,9 +436,29 @@
                     clearInterval(int);
                     document.getElementById('waitingState').classList.add('hidden');
                     document.getElementById('finalState').classList.remove('hidden');
-                    document.getElementById('finalUrl').href = `https://${owner}.github.io/${repo}/`;
+                    document.getElementById('finalUrl').href = targetUrl;
+                    
+                    // Trigger Notification
+                    sendSuccessNotification(targetUrl, repo);
                 }
             }, 1000);
+        }
+
+        function sendSuccessNotification(url, repoName) {
+            if ("Notification" in window && Notification.permission === "granted") {
+                const notification = new Notification("Deployment Live! 🚀", {
+                    body: `Your project "${repoName}" is now live on GitHub Pages.`,
+                    icon: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
+                    tag: "gitfast-deploy",
+                    requireInteraction: true // Keeps notification visible
+                });
+
+                notification.onclick = function(event) {
+                    event.preventDefault();
+                    window.open(url, '_blank');
+                    notification.close();
+                };
+            }
         }
 
         init();
