@@ -205,7 +205,6 @@
                 </div>
                 <div class="relative flex items-center">
                     <i class="fas fa-folder absolute left-4 text-slate-400 text-sm"></i>
-                    <!-- Added autocomplete="off" and spellcheck="false" to prevent password prompts -->
                     <input type="text" id="repoName" name="project_id" autocomplete="off" spellcheck="false" oninput="checkProjectStatus(this.value)" class="input-field h-12 w-full rounded-xl pl-12 pr-4 outline-none text-base font-medium" placeholder="my-web-app">
                 </div>
             </div>
@@ -380,7 +379,7 @@
 
         async function handleDeploy() {
             // Re-request permission if they haven't decided yet
-            if ("Notification" in window && Notification.permission === "default") {
+            if ("Notification" in window && Notification.permission !== "granted") {
                 await Notification.requestPermission();
             }
 
@@ -445,19 +444,28 @@
         }
 
         function sendSuccessNotification(url, repoName) {
+            // Check if permission is granted
             if ("Notification" in window && Notification.permission === "granted") {
-                const notification = new Notification("Deployment Live! 🚀", {
-                    body: `Your project "${repoName}" is now live on GitHub Pages.`,
-                    icon: "https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png",
-                    tag: "gitfast-deploy",
-                    requireInteraction: true // Keeps notification visible
-                });
+                try {
+                    const notification = new Notification("Deployment Live! 🚀", {
+                        body: `Your project "${repoName}" is live on GitHub Pages.`,
+                        icon: "https://github.githubassets.com/favicons/favicon.png",
+                        tag: "gitfast-deploy",
+                        requireInteraction: true 
+                    });
 
-                notification.onclick = function(event) {
-                    event.preventDefault();
-                    window.open(url, '_blank');
-                    notification.close();
-                };
+                    notification.onclick = function(event) {
+                        event.preventDefault();
+                        window.focus();
+                        window.open(url, '_blank');
+                        notification.close();
+                    };
+                } catch (err) {
+                    console.error("Failed to show notification:", err);
+                }
+            } else if ("Notification" in window && Notification.permission !== "denied") {
+                // Fallback attempt to request if state changed
+                Notification.requestPermission();
             }
         }
 
