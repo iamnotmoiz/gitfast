@@ -9,7 +9,7 @@
     <script>
         function applyTheme() {
             const savedTheme = localStorage.getItem('theme');
-            // Default to dark mode if no preference is saved
+            // DEFAULT TO DARK MODE: If no theme is saved, or it is set to dark
             if (savedTheme === 'dark' || !savedTheme) {
                 document.documentElement.classList.add('dark');
                 if (!savedTheme) localStorage.setItem('theme', 'dark');
@@ -64,13 +64,13 @@
             border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
         }
         
-        /* FORCED WHITE TEXT IN DARK MODE FOR ALL INPUTS */
+        /* DARK MODE: MANDATORY WHITE TEXT FOR ALL INPUTS */
         .dark .input-field, 
         .dark input, 
         .dark textarea {
             background: rgba(255, 255, 255, 0.08) !important;
-            color: #ffffff !important; /* Forces white text */
-            -webkit-text-fill-color: #ffffff !important; /* Overrides some browser autofill styles */
+            color: #ffffff !important; 
+            -webkit-text-fill-color: #ffffff !important;
             border: none !important;
         }
         
@@ -104,9 +104,6 @@
         .btn-primary:hover {
             background-color: #0063cc;
             transform: scale(1.02);
-        }
-        .btn-primary:active {
-            transform: scale(0.96);
         }
 
         .input-field {
@@ -200,6 +197,7 @@
         </header>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
+            <!-- Project Name Box -->
             <div class="glass-panel p-6 rounded-[24px] flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-3">
                     <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Project Name</label>
@@ -211,9 +209,13 @@
                 </div>
             </div>
 
+            <!-- Access Token Box -->
             <div class="glass-panel p-6 rounded-[24px] flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-3">
                     <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">GitHub Access Token</label>
+                    <a href="https://github.com/settings/tokens/new" target="_blank" class="text-[10px] font-bold text-sky-500 hover:text-sky-400 uppercase tracking-widest transition-colors flex items-center">
+                        Get Token <i class="fas fa-external-link-alt ml-1.5 text-[8px]"></i>
+                    </a>
                 </div>
                 <div class="flex gap-3">
                     <div class="relative flex-grow flex items-center">
