@@ -9,9 +9,10 @@
     <script>
         function applyTheme() {
             const savedTheme = localStorage.getItem('theme');
-            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            // Default to dark mode if no preference is saved
+            if (savedTheme === 'dark' || !savedTheme) {
                 document.documentElement.classList.add('dark');
+                if (!savedTheme) localStorage.setItem('theme', 'dark');
             } else {
                 document.documentElement.classList.remove('dark');
             }
@@ -34,7 +35,7 @@
 
         /* --- LIGHT MODE --- */
         body:not(.dark) {
-            background-color: #f2f2f7; /* iOS Light Background */
+            background-color: #f2f2f7;
             color: #1c1c1e;
         }
         body:not(.dark) .glass-panel {
@@ -44,13 +45,14 @@
             border: 0.5px solid rgba(0, 0, 0, 0.1);
             box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
         }
-        body:not(.dark) .input-field {
+        body:not(.dark) .input-field,
+        body:not(.dark) input,
+        body:not(.dark) textarea {
             background: rgba(0, 0, 0, 0.05) !important;
             color: #1c1c1e !important;
-            border: none !important;
         }
 
-        /* --- DARK MODE (iOS-style Deep Dark) --- */
+        /* --- DARK MODE --- */
         .dark body {
             background-color: #000000;
             color: #ffffff;
@@ -61,20 +63,32 @@
             -webkit-backdrop-filter: blur(20px);
             border: 0.5px solid rgba(255, 255, 255, 0.1) !important;
         }
-        .dark .input-field {
+        
+        /* FORCED WHITE TEXT IN DARK MODE FOR ALL INPUTS */
+        .dark .input-field, 
+        .dark input, 
+        .dark textarea {
             background: rgba(255, 255, 255, 0.08) !important;
-            color: #ffffff !important;
+            color: #ffffff !important; /* Forces white text */
+            -webkit-text-fill-color: #ffffff !important; /* Overrides some browser autofill styles */
             border: none !important;
         }
+        
+        .dark .input-field::placeholder,
+        .dark input::placeholder,
+        .dark textarea::placeholder {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+
         .dark .input-header {
-            background: rgba(44, 44, 46, 0.5) !important;
+            background: rgba(44, 44, 46, 0.8) !important;
             border-bottom: 0.5px solid rgba(255, 255, 255, 0.1) !important;
         }
         .dark .logo-text { color: #ffffff !important; }
         .dark .brand-icon { background-color: #ffffff; }
         .dark .brand-icon i { color: #000000 !important; }
 
-        /* --- UI ANIMATIONS & HOVERS --- */
+        /* --- UI ELEMENTS --- */
         .glass-panel {
             transition: transform 0.3s var(--ios-spring), box-shadow 0.3s ease;
         }
@@ -84,7 +98,7 @@
         }
 
         .btn-primary {
-            background-color: #007aff; /* iOS Blue */
+            background-color: #007aff;
             transition: all 0.2s var(--ios-spring);
         }
         .btn-primary:hover {
@@ -97,10 +111,11 @@
 
         .input-field {
             transition: all 0.2s ease;
+            border: none !important;
+            outline: none !important;
         }
         .input-field:focus {
             box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.3);
-            background: rgba(255, 255, 255, 0.1) !important;
         }
 
         .code-editor {
@@ -149,7 +164,6 @@
 </head>
 <body class="min-h-screen flex flex-col antialiased overflow-x-hidden">
 
-    <!-- Navigation -->
     <nav class="p-6">
         <div class="max-w-6xl mx-auto flex justify-between items-center py-2">
             <div class="flex items-center space-x-3 group cursor-pointer transition-transform active:scale-95">
@@ -185,9 +199,7 @@
             </h1>
         </header>
 
-        <!-- Balanced Input Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-            <!-- Project Name -->
             <div class="glass-panel p-6 rounded-[24px] flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-3">
                     <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Project Name</label>
@@ -199,7 +211,6 @@
                 </div>
             </div>
 
-            <!-- Access Token -->
             <div class="glass-panel p-6 rounded-[24px] flex flex-col justify-between">
                 <div class="flex justify-between items-center mb-3">
                     <label class="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">GitHub Access Token</label>
@@ -216,7 +227,6 @@
             </div>
         </div>
 
-        <!-- Editor Section -->
         <div class="glass-panel rounded-[24px] overflow-hidden flex flex-col transition-all duration-500">
             <div class="input-header p-4 flex justify-between items-center">
                 <div class="flex space-x-2 px-1">
@@ -230,7 +240,6 @@
             <textarea id="htmlCode" class="code-editor input-field w-full p-6 text-sm leading-relaxed outline-none !bg-transparent border-none !border-0" placeholder="<!-- Paste your HTML here -->"></textarea>
         </div>
 
-        <!-- Action Bar -->
         <div class="flex flex-col md:flex-row items-center justify-between gap-6 pt-4 pb-12">
             <div class="flex items-center space-x-3 opacity-60">
                 <div class="w-2 h-2 rounded-full bg-green-500 animate-ping"></div>
@@ -242,7 +251,6 @@
             </button>
         </div>
 
-        <!-- Progress Indicator -->
         <div id="progressContainer" class="hidden space-y-3 pb-10 animate-fade-in">
             <div class="flex justify-between text-[10px] font-bold uppercase tracking-widest">
                 <span id="progressLabel" class="text-sky-500">Syncing...</span>
@@ -254,7 +262,6 @@
         </div>
     </main>
 
-    <!-- Success/Wait Overlay -->
     <div id="waitOverlay" class="fixed inset-0 bg-black/90 z-[100] hidden flex items-center justify-center p-8 backdrop-blur-2xl transition-all duration-500">
         <div class="max-w-md w-full text-center space-y-8 animate-ios-entry">
             <div id="waitingState">
